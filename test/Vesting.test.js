@@ -1,6 +1,5 @@
 const Vesting = artifacts.require("./VestingUpgradeable");
 const MyToken = artifacts.require("./MyToken");
-const MyProxy = artifacts.require("./MyProxy");
 
 const {
   ether,           // Big Number support
@@ -33,9 +32,9 @@ contract("Vesting", async ([owner, acc2, acc3, acc4, acc5]) => {
     instanceToken = await MyToken.deploy();
     let Vesting = await ethers.getContractFactory("VestingUpgradeable");
     instanceVesting = await Vesting.deploy();
-    instanceVestingProxy = await upgrades.deployProxy(Vesting,[instanceToken.address]);
+    instanceVestingProxy = await upgrades.deployProxy(Vesting, [instanceToken.address]);
     console.log(instanceVesting.address);
-    console.log(await upgrades.erc1967.getImplementationAddress(instanceVestingProxy.address)," getImplementationAddress")
+    console.log(await upgrades.erc1967.getImplementationAddress(instanceVestingProxy.address), " getImplementationAddress")
   });
 
   // describe("false initialization Vesting contract - false", async () => {
@@ -70,7 +69,7 @@ contract("Vesting", async ([owner, acc2, acc3, acc4, acc5]) => {
       it("setInitialTimestamp - Error : 'initialTimestamp_' must be greater than 0", async () => {
         let vestingStartDateBefore = await instanceVesting.vestingStartDate();
         expect(vestingStartDateBefore).to.be.bignumber.equal(new BN(0));
-        await expectRevert(instanceVesting.setInitialTimestamp(new BN(0),{ from: owner }), "Error : 'initialTimestamp_' must be greater than 0");
+        await expectRevert(instanceVesting.setInitialTimestamp(new BN(0), { from: owner }), "Error : 'initialTimestamp_' must be greater than 0");
         let vestingStartDate = await instanceVesting.vestingStartDate();
         expect(vestingStartDate).to.be.bignumber.equal(new BN(0));
       });
