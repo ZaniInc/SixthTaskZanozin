@@ -2,10 +2,11 @@
 
 pragma solidity 0.8.7;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "./interfaces/IVesting.sol";
 
 /**
@@ -14,9 +15,9 @@ import "./interfaces/IVesting.sol";
  * @notice This SC for unlock tokens after presale
  * on Seed and Private rounds
  */
-contract Vesting is IVesting, Ownable {
-    using SafeERC20 for IERC20;
-    using Address for address;
+contract VestingUpgradeable is IVesting, OwnableUpgradeable {
+    using SafeERC20Upgradeable for IERC20Upgradeable;
+    using AddressUpgradeable for address;
 
     /**
      * @dev this mean 100% of tokens amount
@@ -60,7 +61,7 @@ contract Vesting is IVesting, Ownable {
      */
     mapping(AllocationType => uint256) private _initialPercentage;
 
-    IERC20 private _token;
+    IERC20Upgradeable private _token;
 
     /**
      * @dev Set '_token' IERC20 to interact with thrid party token
@@ -68,12 +69,13 @@ contract Vesting is IVesting, Ownable {
      * @param token_ - of ERC20 contract
      * @notice set percentage for AllocationTypes
      */
-    constructor(address token_) {
+    function initialize(address token_) public initializer {
         require(
             token_.isContract(),
             "Error : Incorrect address , only contract address"
         );
-        _token = IERC20(token_);
+        __Ownable_init();
+        _token = IERC20Upgradeable(token_);
         _initialPercentage[AllocationType.SEED] = 10 ether;
         _initialPercentage[AllocationType.PRIVATE] = 15 ether;
     }

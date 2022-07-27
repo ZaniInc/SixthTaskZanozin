@@ -1,5 +1,6 @@
-const Vesting = artifacts.require("./Vesting");
+const Vesting = artifacts.require("./VestingUpgradeable");
 const MyToken = artifacts.require("./MyToken");
+const MyProxy = artifacts.require("./MyProxy");
 
 const {
   ether,           // Big Number support
@@ -11,6 +12,8 @@ const {
 } = require('@openzeppelin/test-helpers');
 
 const { expect } = require("chai");
+const { BigNumber } = require('ethers');
+const { upgrades } = require('hardhat');
 const BN = Web3.utils.BN;
 
 let Allocation = {
@@ -21,18 +24,31 @@ let Allocation = {
 contract("Vesting", async ([owner, acc2, acc3, acc4, acc5]) => {
 
   let instanceToken;
+  let instanceVestingProxy;
   let instanceVesting;
+  let MyToken;
 
   before(async () => {
-    instanceToken = await MyToken.new();
-    instanceVesting = await Vesting.new(instanceToken.address);
+    MyToken = await hre.ethers.getContractFactory("MyToken");
+    instanceToken = await MyToken.deploy();
+    let Vesting = await ethers.getContractFactory("VestingUpgradeable");
+    instanceVesting = await Vesting.deploy();
+    instanceVestingProxy = await upgrades.deployProxy(Vesting,[instanceToken.address]);
+    console.log(instanceVesting.address);
+    console.log(await upgrades.erc1967.getImplementationAddress(instanceVestingProxy.address)," getImplementationAddress")
   });
 
-  describe("Deploy Vesting contract - false", async () => {
-    it("Error : Incorrect address , only contract address", async () => {
-      await expectRevert(Vesting.new(acc2), "Error : Incorrect address , only contract address");
-    });
-  });
+  // describe("false initialization Vesting contract - false", async () => {
+  //   it("Error : Incorrect address , only contract address", async () => {
+  //     await expectRevert(instanceVestingProxy.initialize(acc2), "Error : Incorrect address , only contract address");
+  //   });
+  // });
+
+  // describe("correct initialization Vesting contract", async () => {
+  //   it("correct initialization", async () => {
+  //     await instanceVestingProxy.initialize(instanceToken.address);
+  //   });
+  // });
 
   describe("Rigth initialization", async () => {
     it("check owner balance - result 100000 tokens", async () => {
@@ -46,15 +62,15 @@ contract("Vesting", async ([owner, acc2, acc3, acc4, acc5]) => {
     describe("setInitialTimestamp function - false", async () => {
       it("setInitialTimestamp - caller is not the owner", async () => {
         let vestingStartDateBefore = await instanceVesting.vestingStartDate();
-        expect(vestingStartDateBefore).to.be.bignumber.equal(new BN(0));
-        await expectRevert(instanceVesting.setInitialTimestamp(new BN(60), { from: acc2 }), "Ownable: caller is not the owner");
+        await expect(vestingStartDateBefore).to.be.bignumber.equal(ether('0'));
+        await expectRevert(instanceVestingProxy.setInitialTimestamp(ether('0'), { from: acc2 }), "Ownable: caller is not the owner");
         let vestingStartDate = await instanceVesting.vestingStartDate();
-        expect(vestingStartDate).to.be.bignumber.equal(new BN(0));
+        await expect(vestingStartDate).to.be.bignumber.equal(ether('0'));
       });
       it("setInitialTimestamp - Error : 'initialTimestamp_' must be greater than 0", async () => {
         let vestingStartDateBefore = await instanceVesting.vestingStartDate();
         expect(vestingStartDateBefore).to.be.bignumber.equal(new BN(0));
-        await expectRevert(instanceVesting.setInitialTimestamp(new BN(0)), "Error : 'initialTimestamp_' must be greater than 0");
+        await expectRevert(instanceVesting.setInitialTimestamp(new BN(0),{ from: owner }), "Error : 'initialTimestamp_' must be greater than 0");
         let vestingStartDate = await instanceVesting.vestingStartDate();
         expect(vestingStartDate).to.be.bignumber.equal(new BN(0));
       });
