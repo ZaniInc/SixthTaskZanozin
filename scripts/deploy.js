@@ -9,10 +9,8 @@ async function main() {
   const Vesting = await hre.ethers.getContractFactory("VestingUpgradeable");
   const vesting = await Vesting.deploy();
   await vesting.deployed();
-  // const VestingProxy = await hre.ethers.getContractFactory("VestingUpgradeable");
   const vestingProxy = await upgrades.deployProxy(Vesting,[myToken.address]);
   await vestingProxy.deployed();
-  // await instanceVesting.initialize(myToken.address);
 
   console.log("Vesting deployed to:", vesting.address);
   console.log("MyToken deployed to:", myToken.address);

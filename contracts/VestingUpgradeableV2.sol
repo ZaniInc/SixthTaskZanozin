@@ -10,12 +10,12 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "./interfaces/IVesting.sol";
 
 /**
- * @title VestingUpgradeable
+ * @title VestingUpgradeableV2
  * @author ZaniInc
- * @notice This SC for unlock tokens after presale
- * on Seed and Private rounds
+ * @notice This is second version of Vesting contract
+ * have one new function , modifier and state variable
  */
-contract VestingUpgradeable is IVesting, OwnableUpgradeable {
+contract VestingUpgradeableV2 is IVesting, OwnableUpgradeable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
     using AddressUpgradeable for address;
 
@@ -64,11 +64,28 @@ contract VestingUpgradeable is IVesting, OwnableUpgradeable {
     IERC20Upgradeable private _token;
 
     /**
-     * @dev Set '_token' IERC20 to interact with thrid party token.
-     * This is init function like constructor but for Upgradeable contracts
+     * @dev bool variable by default equal 'false'.
+     * 
+     * @notice using for limits call 'changeOwner'
+     * function
+     */
+    bool public onlyOnceVar;
+
+    /**
+     * @dev modifier set limit of function calls
+     * if function have this modifier - that means
+     * you can call function only one time
      *
-     * Proxy contracts dont have access to constructors because they are
-     * not in the abi interface , so make decision create 'initialize' function
+     * @notice can be set only for one function.Only for PR
+     * first part of task
+     */
+    modifier onlyOnce() {
+        require(!onlyOnceVar, "Error : can call only once time");
+        _;
+    }
+
+    /**
+     * @dev Set '_token' IERC20 to interact with thrid party token
      *
      * @param token_ - of ERC20 contract
      * @notice set percentage for AllocationTypes
@@ -82,6 +99,19 @@ contract VestingUpgradeable is IVesting, OwnableUpgradeable {
         _token = IERC20Upgradeable(token_);
         _initialPercentage[AllocationType.SEED] = 10 ether;
         _initialPercentage[AllocationType.PRIVATE] = 15 ether;
+    }
+
+    /**
+     * @dev this function allows to owner only one time
+     * change contract owner. Only for PR first part of task after , will be
+     * change on 'changeInvestor' function
+     *
+     * @param newOwner_ - address of new contract owner
+     */
+    function changeOwner(address newOwner_) external onlyOnce onlyOwner {
+        require(newOwner_ != address(0),"Error : address can't be 0");
+        onlyOnceVar = true;
+        transferOwnership(newOwner_);
     }
 
     /**
