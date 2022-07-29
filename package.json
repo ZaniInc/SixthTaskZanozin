@@ -20,6 +20,7 @@
     "@openzeppelin/hardhat-upgrades": "^1.19.1",
     "@openzeppelin/test-helpers": "^0.5.15",
     "hardhat": "^2.10.1",
-    "solhint": "^3.3.7"
+    "solhint": "^3.3.7",
+    "solidity-coverage": "^0.7.21"
   }
 }

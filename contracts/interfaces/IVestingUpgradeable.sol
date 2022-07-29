@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.7;
 
-interface IVesting {
+interface IVestingUpgradeable {
     /**
      * @dev Store info about beneficiaries
      * @param initialReward - set how many tokens available to
@@ -90,4 +90,12 @@ interface IVesting {
      * 'msg.sender'
      */
     function withdrawTokens() external;
+
+    /**
+     * @dev Set '_token' IERC20 to interact with thrid party token
+     *
+     * @param token_ - of ERC20 contract
+     * @notice set percentage for AllocationTypes
+     */
+    function initialize(address token_) external;
 }

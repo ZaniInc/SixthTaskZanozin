@@ -2,6 +2,7 @@ require("@nomiclabs/hardhat-web3");
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-truffle5");
 require('@openzeppelin/hardhat-upgrades');
+require("solidity-coverage");
 
 require("@nomiclabs/hardhat-etherscan");
 let secret = require("./secret.json")

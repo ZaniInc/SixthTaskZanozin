@@ -7,7 +7,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "./interfaces/IVesting.sol";
+import "./interfaces/IVestingUpgradeable.sol";
 
 /**
  * @title VestingUpgradeable
@@ -15,7 +15,7 @@ import "./interfaces/IVesting.sol";
  * @notice This SC for unlock tokens after presale
  * on Seed and Private rounds
  */
-contract VestingUpgradeable is IVesting, OwnableUpgradeable {
+contract VestingUpgradeable is IVestingUpgradeable, OwnableUpgradeable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
     using AddressUpgradeable for address;
 
@@ -73,7 +73,7 @@ contract VestingUpgradeable is IVesting, OwnableUpgradeable {
      * @param token_ - of ERC20 contract
      * @notice set percentage for AllocationTypes
      */
-    function initialize(address token_) external initializer {
+    function initialize(address token_) external override initializer {
         require(
             token_.isContract(),
             "Error : Incorrect address , only contract address"

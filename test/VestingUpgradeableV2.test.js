@@ -130,6 +130,13 @@ contract("VestingV2 ", async ([owner, acc2, acc3, acc4, acc5, acc6, acc7]) => {
         await instanceToken.approve(instanceVestingProxy.address, ether('6000'));
         await expectRevert(instanceVestingProxy.addInvestors(arrayInvestors, arrayAmounts, arrayEnums), "Error : Different arrays length");
       });
+      it("set Investors - Error : Different arrays length", async () => {
+        let arrayInvestors = [acc2, acc3];
+        let arrayAmounts = [ether('1000'), ether('2000'), ether('3000')];
+        let arrayEnums = [Allocation.Seed, Allocation.Private,Allocation.Seed];
+        await instanceToken.approve(instanceVestingProxy.address, ether('6000'));
+        await expectRevert(instanceVestingProxy.addInvestors(arrayInvestors, arrayAmounts, arrayEnums), "Error : Different arrays length");
+      });
       it("set Investors - Error : 'investors_' or 'amount_' , equal to 0", async () => {
         let arrayInvestors = [constants.ZERO_ADDRESS, acc3];
         let arrayAmounts = [ether('1000'), ether('2000')];

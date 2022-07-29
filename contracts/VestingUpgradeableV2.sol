@@ -7,7 +7,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "./interfaces/IVesting.sol";
+import "./interfaces/IVestingUpgradeableV2.sol";
 
 /**
  * @title VestingUpgradeableV2
@@ -15,7 +15,7 @@ import "./interfaces/IVesting.sol";
  * @notice This is second version of Vesting contract
  * have one new function , modifier and state variable
  */
-contract VestingUpgradeableV2 is IVesting, OwnableUpgradeable {
+contract VestingUpgradeableV2 is IVestingUpgradeableV2, OwnableUpgradeable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
     using AddressUpgradeable for address;
 
@@ -65,7 +65,7 @@ contract VestingUpgradeableV2 is IVesting, OwnableUpgradeable {
 
     /**
      * @dev bool variable by default equal 'false'.
-     * 
+     *
      * @notice using for limits call 'changeOwner'
      * function
      */
@@ -90,7 +90,7 @@ contract VestingUpgradeableV2 is IVesting, OwnableUpgradeable {
      * @param token_ - of ERC20 contract
      * @notice set percentage for AllocationTypes
      */
-    function initialize(address token_) external initializer {
+    function initialize(address token_) external override initializer {
         require(
             token_.isContract(),
             "Error : Incorrect address , only contract address"
@@ -108,8 +108,13 @@ contract VestingUpgradeableV2 is IVesting, OwnableUpgradeable {
      *
      * @param newOwner_ - address of new contract owner
      */
-    function changeOwner(address newOwner_) external onlyOnce onlyOwner {
-        require(newOwner_ != address(0),"Error : address can't be 0");
+    function changeOwner(address newOwner_)
+        external
+        override
+        onlyOnce
+        onlyOwner
+    {
+        require(newOwner_ != address(0), "Error : address can't be 0");
         onlyOnceVar = true;
         transferOwnership(newOwner_);
     }
