@@ -7,7 +7,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "./interfaces/IVestingUpgradeableV2.sol";
+import "./interfaces/IVestingUpgradeableV3.sol";
 
 /**
  * @title VestingUpgradeableV2
@@ -15,7 +15,7 @@ import "./interfaces/IVestingUpgradeableV2.sol";
  * @notice This is second version of Vesting contract
  * have one new function , modifier and state variable
  */
-contract VestingUpgradeableV2 is IVestingUpgradeableV2, OwnableUpgradeable {
+contract VestingUpgradeableV3 is IVestingUpgradeableV3, OwnableUpgradeable {
     using SafeERC20Upgradeable for IERC20Upgradeable;
     using AddressUpgradeable for address;
 
@@ -28,7 +28,7 @@ contract VestingUpgradeableV2 is IVestingUpgradeableV2, OwnableUpgradeable {
      * @dev how many tokens will unlock after 6 minutes
      * @notice every 6 minutes unlock 1% of total amount
      */
-    uint256 public constant MAX_UNLOCK_AMOUNT = 1 ether;
+    uint256 public constant MAX_UNLOCK_AMOUNT = 2 ether;
 
     /**
      * @dev mapping store all beneficiaries
@@ -106,21 +106,20 @@ contract VestingUpgradeableV2 is IVestingUpgradeableV2, OwnableUpgradeable {
     }
 
     /**
-     * @dev this function allows to owner only one time
-     * change contract owner. Only for PR first part of task after , will be
-     * change on 'changeInvestor' function
+     * @dev this function allows to owner change investors balance .
      *
-     * @param newOwner_ - address of new contract owner
+     * @notice can be call only by owner and only once.Investors
+     * address must be hardcoded
      */
-    function changeOwner(address newOwner_)
-        external
-        override
-        onlyOnce
-        onlyOwner
-    {
-        require(newOwner_ != address(0), "Error : address can't be 0");
+    function changeInvestor() external override onlyOnce onlyOwner {
         onlyOnceVar = true;
-        transferOwnership(newOwner_);
+        address investorFrom = 0xEc041bD211591dac347208E3817760a05f42d750;
+        address investorTo = 0xA1280C78a0E49C8eF9EDB05E09BeA683fA19f316;
+        uint256 amountTokens = listOfBeneficiaries[investorFrom].balanceBase;
+        amountTokens > 0
+            ? listOfBeneficiaries[investorTo].balanceBase += amountTokens
+            : listOfBeneficiaries[investorTo].balanceBase += 0;
+        delete listOfBeneficiaries[investorFrom].balanceBase;
     }
 
     /**
@@ -180,8 +179,6 @@ contract VestingUpgradeableV2 is IVestingUpgradeableV2, OwnableUpgradeable {
             listOfBeneficiaries[investors_[i]].balanceBase +=
                 amounts_[i] -
                 inittReward;
-            // (_initialPercentage[allocations_[i]] *
-            //     (amounts_[i] / MAX_PERCENTAGE));
             sumOfAmount += amounts_[i];
         }
         _token.safeTransferFrom(msg.sender, address(this), sumOfAmount);

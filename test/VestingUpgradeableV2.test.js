@@ -1,7 +1,7 @@
 const VestingV1 = artifacts.require("./VestingUpgradeable");
 const VestingV2 = artifacts.require("./VestingUpgradeableV2");
 const MyToken = artifacts.require("./MyToken");
-const MyProxy = artifacts.require("./MyProxy");
+const MyProxy = artifacts.require("./TransparentUpgradeableProxy");
 
 const {
   ether,           // Big Number support

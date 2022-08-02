@@ -1,6 +1,6 @@
 const VestingV1 = artifacts.require("./VestingUpgradeable");
 const MyToken = artifacts.require("./MyToken");
-const MyProxy = artifacts.require("./MyProxy");
+const MyProxy = artifacts.require("./TransparentUpgradeableProxy");
 
 const {
   ether,           // Big Number support
@@ -170,6 +170,7 @@ contract("Vesting", async ([owner, acc2, acc3, acc4, acc5, acc6]) => {
         expectEvent(tx, "AddInvestors", { investors: arrayInvestors });
         expect(event.args.balances.toString()).to.be.equal(arrayAmounts.toString());
         expect(event.args.allocations.toString()).to.be.equal(arrayEnums.toString());
+        console.log(arrayAmounts.toString());
       });
       it("set Investors - done acc4 , have two allocations", async () => {
         let arrayInvestors = [acc4];

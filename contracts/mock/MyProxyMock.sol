@@ -19,7 +19,7 @@ import "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.so
  * when 'delegateCall' , calle using state from caller and change
  * state of caller.
  */
-contract MyProxy is TransparentUpgradeableProxy {
+contract MyProxyMock is TransparentUpgradeableProxy {
     /**
      * @dev Initializes an upgradeable proxy managed by `_admin`, backed by the implementation at `_logic`, and
      * optionally initialized with `_data` as explained in {ERC1967Proxy-constructor}.

@@ -6,7 +6,7 @@
     "avoid-sha3": "error",
     "compiler-version": [
       "error",
-      "0.8.14"
+      "0.8.7"
     ],
     "no-empty-blocks": "off",
     "func-visibility": [
