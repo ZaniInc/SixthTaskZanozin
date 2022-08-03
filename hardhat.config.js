@@ -19,7 +19,7 @@ module.exports = {
   networks:{
     ropsten : {
       url: secret.api,
-      accounts:[secret.key],
+      accounts:[secret.key2],
     }
   },
   etherscan:{

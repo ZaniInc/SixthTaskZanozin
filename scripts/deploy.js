@@ -11,7 +11,7 @@ async function main() {
   const vesting = await Vesting.deploy();
   await vesting.deployed();
   const ProxyContract = await hre.ethers.getContractFactory("TransparentUpgradeableProxy");
-  const proxy = await ProxyContract.deploy(vesting.address,owner,[]);
+  const proxy = await ProxyContract.deploy(vesting.address, owner, []);
   await proxy.deployed();
 
   console.log("Vesting deployed to:", vesting.address);
