@@ -142,7 +142,7 @@ contract VestingUpgradeableV3 is IVestingUpgradeableV3, OwnableUpgradeable {
         require(vestingStartDate == 0, "error : can call only once time");
         vestingStartDate = initialTimestamp_;
         vestingCliff = vestingStartDate + 10 minutes;
-        vestingDuration = vestingCliff + 300 minutes;
+        vestingDuration = vestingCliff + 600 minutes;
         emit SetInitialTime(vestingStartDate);
     }
 
@@ -217,7 +217,7 @@ contract VestingUpgradeableV3 is IVestingUpgradeableV3, OwnableUpgradeable {
     function _calculateUnlock() internal view returns (uint256) {
         uint256 onePercentInTokens = (MAX_UNLOCK_AMOUNT *
             listOfBeneficiaries[msg.sender].balanceBase) / MAX_PERCENTAGE;
-        if (block.timestamp < vestingDuration) {
+        if (block.timestamp < (vestingDuration - 300 minutes)) {
             uint256 passedPeriods = (block.timestamp - vestingCliff) /
                 6 minutes;
             uint256 total = ((passedPeriods * onePercentInTokens) +

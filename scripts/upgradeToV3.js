@@ -1,7 +1,7 @@
 
 const hre = require("hardhat");
 const owner = "0xC4aA7812309C2e9CF04fb0fC2Ba2492b8DaB1A16";
-const vestingV3 = "0xede716a7087307eB8cffC9111C361a78A26c8f15";
+const vestingV3 = "0xD81F99940b89D505C1E9370d18b6a76ED76e4E92";
 
 async function main() {
 

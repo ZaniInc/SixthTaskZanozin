@@ -8,7 +8,7 @@ async function main() {
   const vestingV3 = await VestingV3.deploy();
   await vestingV3.deployed();
 
-  console.log("Vesting deployed to:", vestingV3.address);
+  console.log("VestingV3 deployed to:", vestingV3.address);
 }
 
 main()
