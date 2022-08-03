@@ -26,7 +26,7 @@ contract VestingUpgradeableV3 is IVestingUpgradeableV3, OwnableUpgradeable {
     uint256 public constant MAX_PERCENTAGE = 100 ether;
     /**
      * @dev how many tokens will unlock after 6 minutes
-     * @notice every 6 minutes unlock 1% of total amount
+     * @notice every 6 minutes unlock 2% of total amount
      */
     uint256 public constant MAX_UNLOCK_AMOUNT = 2 ether;
 
@@ -142,7 +142,7 @@ contract VestingUpgradeableV3 is IVestingUpgradeableV3, OwnableUpgradeable {
         require(vestingStartDate == 0, "error : can call only once time");
         vestingStartDate = initialTimestamp_;
         vestingCliff = vestingStartDate + 10 minutes;
-        vestingDuration = vestingCliff + 600 minutes;
+        vestingDuration = vestingCliff + 300 minutes;
         emit SetInitialTime(vestingStartDate);
     }
 
@@ -226,7 +226,7 @@ contract VestingUpgradeableV3 is IVestingUpgradeableV3, OwnableUpgradeable {
             return total;
         } else {
             return
-                ((onePercentInTokens * 100) +
+                ((onePercentInTokens * 50) +
                     listOfBeneficiaries[msg.sender].initialReward) -
                 listOfBeneficiaries[msg.sender].rewardPaid;
         }
