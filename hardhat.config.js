@@ -31,4 +31,4 @@ module.exports = {
 // Vesting deployed to: 0x3Bdb26035b97fce963F19CbbBA8224460E0CaFc1
 // MyToken deployed to: 0xc6380fe9244C1B050961E7F0882B6534e72101e4
 // Proxy deployed to: 0x4871F59ADa92D0c16474c3Adef495c9A49921Ca3
-// VestingV3 deployed to: 0x8FD6FE26b9e0EEbee108A731A47477C7230dcE6a
+// VestingV3 deployed to: 0xD81F99940b89D505C1E9370d18b6a76ED76e4E92
