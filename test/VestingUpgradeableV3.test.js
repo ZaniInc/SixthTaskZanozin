@@ -25,6 +25,9 @@ let Allocation = {
   Private: 1
 }
 
+let acc7 = "0xEc041bD211591dac347208E3817760a05f42d750";
+let acc8 = "0xA1280C78a0E49C8eF9EDB05E09BeA683fA19f316";
+
 contract("VestingV2 ", async ([owner, acc2, acc3, acc4, acc5, acc6]) => {
 
   let instanceToken;
@@ -151,6 +154,8 @@ contract("VestingV2 ", async ([owner, acc2, acc3, acc4, acc5, acc6]) => {
         let investor1 = await instanceVestingProxy.listOfBeneficiaries(acc2);
         let investor2 = await instanceVestingProxy.listOfBeneficiaries(acc3);
         let investor3 = await instanceVestingProxy.listOfBeneficiaries(acc4);
+        let investor4 = await instanceVestingProxy.listOfBeneficiaries(acc7);
+        let investor5 = await instanceVestingProxy.listOfBeneficiaries(acc8);
         expect(investor1[0]).to.be.bignumber.equal(ether('0'));
         expect(investor1[1]).to.be.bignumber.equal(ether('0'));
         expect(investor1[2]).to.be.bignumber.equal(ether('0'));
@@ -163,10 +168,18 @@ contract("VestingV2 ", async ([owner, acc2, acc3, acc4, acc5, acc6]) => {
         expect(investor3[1]).to.be.bignumber.equal(ether('0'));
         expect(investor3[2]).to.be.bignumber.equal(ether('0'));
         expect(investor3[3]).to.be.bignumber.equal(ether('0'));
+        expect(investor4[0]).to.be.bignumber.equal(ether('0'));
+        expect(investor4[1]).to.be.bignumber.equal(ether('0'));
+        expect(investor4[2]).to.be.bignumber.equal(ether('0'));
+        expect(investor4[3]).to.be.bignumber.equal(ether('0'));
+        expect(investor5[0]).to.be.bignumber.equal(ether('0'));
+        expect(investor5[1]).to.be.bignumber.equal(ether('0'));
+        expect(investor5[2]).to.be.bignumber.equal(ether('0'));
+        expect(investor5[3]).to.be.bignumber.equal(ether('0'));
       });
     });
 
-    describe("addInvestors function - done", async () => {
+    describe("addInvestors - should success", async () => {
       it("set Investors - done", async () => {
         let arrayInvestors = [acc2, acc3, acc4];
         let arrayAmounts = [ether('1000'), ether('2000'), ether('3000')];
@@ -201,6 +214,21 @@ contract("VestingV2 ", async ([owner, acc2, acc3, acc4, acc5, acc6]) => {
         expect(event.args.balances.toString()).to.be.equal(arrayAmounts.toString());
         expect(event.args.allocations.toString()).to.be.equal(arrayEnums.toString());
       });
+      it("Should success set investors", async () => {
+        let arrayInvestors = [acc7,acc8];
+        let arrayAmounts = [ether('1000'), ether('2000')];
+        let arrayEnums = [Allocation.Seed, Allocation.Private];
+        await instanceToken.approve(instanceVestingProxy.address, ether('3000'));
+        let balanceBefore = await instanceToken.balanceOf(owner);
+        expect(balanceBefore).to.be.bignumber.equal(ether('93000'));
+        let tx = await instanceVestingProxy.addInvestors(arrayInvestors, arrayAmounts, arrayEnums);
+        let balanceAfter = await instanceToken.balanceOf(owner);
+        expect(balanceAfter).to.be.bignumber.equal(ether('90000'));
+        let event = expectEvent(tx, "AddInvestors");
+        expectEvent(tx, "AddInvestors", { investors: arrayInvestors });
+        expect(event.args.balances.toString()).to.be.equal(arrayAmounts.toString());
+        expect(event.args.allocations.toString()).to.be.equal(arrayEnums.toString());
+      });
     });
 
     describe("addInvestors function - check result", async () => {
@@ -208,6 +236,8 @@ contract("VestingV2 ", async ([owner, acc2, acc3, acc4, acc5, acc6]) => {
         let investor1 = await instanceVestingProxy.listOfBeneficiaries(acc2);
         let investor2 = await instanceVestingProxy.listOfBeneficiaries(acc3);
         let investor3 = await instanceVestingProxy.listOfBeneficiaries(acc4);
+        let investor4 = await instanceVestingProxy.listOfBeneficiaries(acc7);
+        let investor5 = await instanceVestingProxy.listOfBeneficiaries(acc8);
         expect(investor1[0]).to.be.bignumber.equal(ether('100').toString());
         expect(investor1[1]).to.be.bignumber.equal(ether('0').toString());
         expect(investor1[2]).to.be.bignumber.equal(ether('900').toString());
@@ -220,20 +250,52 @@ contract("VestingV2 ", async ([owner, acc2, acc3, acc4, acc5, acc6]) => {
         expect(investor3[1]).to.be.bignumber.equal(ether('0').toString());
         expect(investor3[2]).to.be.bignumber.equal(ether('3550').toString());
         expect(investor3[3]).to.be.bignumber.equal(Allocation.Private.toString());
+        expect(investor4[0]).to.be.bignumber.equal(ether('100').toString());
+        expect(investor4[1]).to.be.bignumber.equal(ether('0').toString());
+        expect(investor4[2]).to.be.bignumber.equal(ether('900').toString());
+        expect(investor4[3]).to.be.bignumber.equal(Allocation.Seed.toString());
+        expect(investor5[0]).to.be.bignumber.equal(ether('300').toString());
+        expect(investor5[1]).to.be.bignumber.equal(ether('0').toString());
+        expect(investor5[2]).to.be.bignumber.equal(ether('1700').toString());
+        expect(investor5[3]).to.be.bignumber.equal(Allocation.Private.toString());
       });
     });
   });
 
   describe("Upgrade implementation contract to V3", async () => {
     it("Set new logic contract", async () => {
-      // let currentContract = await instanceVestingProxyBase.implementation({ from: acc6 });
-      // console.log(currentContract);
-      // expect(currentContract.toString()).to.be.equal(instanceVestingV1.address);
+      let currentContract = await instanceVestingProxyBase.implementation.call({ from: acc6 });
+      expect(currentContract.toString()).to.be.equal(instanceVestingV1.address);
       instanceVestingV3 = await VestingV3.new();
       await instanceVestingProxyBase.upgradeTo(instanceVestingV3.address, { from: acc6 });
       instanceVestingProxy = await VestingV3.at(instanceVestingProxyBase.address);
-      // let newContract = await instanceVestingProxyBase.implementation({ from: acc6 });
-      // expect(newContract.toString()).to.be.equal(instanceVestingV3.address);
+      let newContract = await instanceVestingProxyBase.implementation.call({ from: acc6 });
+      expect(newContract.toString()).to.be.equal(instanceVestingV3.address);
+    });
+  });
+
+  describe("changeInvestor", async () => {
+    it("Should success", async () => {
+      let varStatusBefore = await instanceVestingProxy.onlyOnceVar();
+      expect(varStatusBefore).to.be.equal(false);
+      await instanceVestingProxy.changeInvestor();
+      let varStatusAfter = await instanceVestingProxy.onlyOnceVar();
+      expect(varStatusAfter).to.be.equal(true);
+    });
+    it("Check investors after", async () => {
+      let investor4 = await instanceVestingProxy.listOfBeneficiaries(acc7);
+      let investor5 = await instanceVestingProxy.listOfBeneficiaries(acc8);
+      expect(investor4[0]).to.be.bignumber.equal(ether('0').toString());
+      expect(investor4[1]).to.be.bignumber.equal(ether('0').toString());
+      expect(investor4[2]).to.be.bignumber.equal(ether('0').toString());
+      expect(investor4[3]).to.be.bignumber.equal(Allocation.Seed.toString());
+      expect(investor5[0]).to.be.bignumber.equal(ether('300').toString());
+      expect(investor5[1]).to.be.bignumber.equal(ether('0').toString());
+      expect(investor5[2]).to.be.bignumber.equal(ether('2700').toString());
+      expect(investor5[3]).to.be.bignumber.equal(Allocation.Private.toString());
+    });
+    it("Should fail if call second time", async () => {
+      await expectRevert(instanceVestingProxy.changeInvestor(),"Error : can call only once time");
     });
   });
 
@@ -349,10 +411,10 @@ contract("VestingV2 ", async ([owner, acc2, acc3, acc4, acc5, acc6]) => {
         let investor1 = await instanceVestingProxy.listOfBeneficiaries(acc5);
         expect(investor1[1]).to.be.bignumber.equal(ether('0'));
         let balanceBeforeOwner = await instanceToken.balanceOf(owner);
-        expect(balanceBeforeOwner).to.be.bignumber.equal(ether('92000'));
+        expect(balanceBeforeOwner).to.be.bignumber.equal(ether('89000'));
         let tx = await instanceVestingProxy.withdrawTokens({ from: acc5 });
         let balanceAfterOwner = await instanceToken.balanceOf(owner);
-        expect(balanceAfterOwner).to.be.bignumber.equal(ether('92000'));
+        expect(balanceAfterOwner).to.be.bignumber.equal(ether('89000'));
         let investorr1 = await instanceVestingProxy.listOfBeneficiaries(acc5);
         expect(investorr1[1]).to.be.bignumber.equal(ether('983'));
         balanceTokens = await instanceToken.balanceOf(acc5);
@@ -378,10 +440,10 @@ contract("VestingV2 ", async ([owner, acc2, acc3, acc4, acc5, acc6]) => {
         let arrayEnums = [Allocation.Private];
         await instanceToken.approve(instanceVestingProxy.address, ether('1000'));
         let balanceBefore = await instanceToken.balanceOf(owner);
-        expect(balanceBefore).to.be.bignumber.equal(ether('92000'));
+        expect(balanceBefore).to.be.bignumber.equal(ether('89000'));
         let tx = await instanceVestingProxy.addInvestors(arrayInvestors, arrayAmounts, arrayEnums);
         let balanceAfter = await instanceToken.balanceOf(owner);
-        expect(balanceAfter).to.be.bignumber.equal(ether('91000'));
+        expect(balanceAfter).to.be.bignumber.equal(ether('88000'));
         let event = expectEvent(tx, "AddInvestors");
         expectEvent(tx, "AddInvestors", { investors: arrayInvestors });
         expect(event.args.balances.toString()).to.be.equal(arrayAmounts.toString());
@@ -423,10 +485,10 @@ contract("VestingV2 ", async ([owner, acc2, acc3, acc4, acc5, acc6]) => {
       });
       it("withdrawTokens - Error : No available tokens to withdraw ", async () => {
         let balanceBefore = await instanceToken.balanceOf(owner);
-        expect(balanceBefore).to.be.bignumber.equal(ether('91000'))
+        expect(balanceBefore).to.be.bignumber.equal(ether('88000'))
         await expectRevert(instanceVestingProxy.withdrawTokens({ from: owner }), "Error : No available tokens to withdraw");
         let balanceTokens = await instanceToken.balanceOf(owner);
-        expect(balanceTokens).to.be.bignumber.equal(ether('91000'))
+        expect(balanceTokens).to.be.bignumber.equal(ether('88000'))
       });
     });
 

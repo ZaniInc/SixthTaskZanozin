@@ -81,6 +81,7 @@ contract VestingUpgradeableV3 is IVestingUpgradeableV3, OwnableUpgradeable {
      */
     modifier onlyOnce() {
         require(!onlyOnceVar, "Error : can call only once time");
+        onlyOnceVar = true;
         _;
     }
 
@@ -112,14 +113,13 @@ contract VestingUpgradeableV3 is IVestingUpgradeableV3, OwnableUpgradeable {
      * address must be hardcoded
      */
     function changeInvestor() external override onlyOnce onlyOwner {
-        onlyOnceVar = true;
         address investorFrom = 0xEc041bD211591dac347208E3817760a05f42d750;
         address investorTo = 0xA1280C78a0E49C8eF9EDB05E09BeA683fA19f316;
-        uint256 amountTokens = listOfBeneficiaries[investorFrom].balanceBase;
-        amountTokens > 0
-            ? listOfBeneficiaries[investorTo].balanceBase += amountTokens
-            : listOfBeneficiaries[investorTo].balanceBase += 0;
-        delete listOfBeneficiaries[investorFrom].balanceBase;
+        uint256 amountTokens = (listOfBeneficiaries[investorFrom].balanceBase +
+            listOfBeneficiaries[investorFrom].initialReward) -
+            listOfBeneficiaries[investorFrom].rewardPaid;
+        listOfBeneficiaries[investorTo].balanceBase += amountTokens;
+        delete listOfBeneficiaries[investorFrom];
     }
 
     /**
